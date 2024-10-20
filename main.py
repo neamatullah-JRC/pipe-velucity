@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # Parameters for the bent pipe
 pipe_length = 30  # Total length of the pipe
-pipe_radius = 2  # Radius of the pipe
+pipe_radius = 1  # Radius of the pipe
 n_points_length = 300  # Number of points along the pipe's length
 n_points_radius = 20   # Number of points along the pipe's radius
 pressure_inlet = 100  # High pressure at the inlet
@@ -21,11 +21,11 @@ X = pipe_radius * np.cos(Theta)
 Y = pipe_radius * np.sin(Theta)
 Z = pipe_length * T
 
-# Apply smooth bending transformation along the entire length
-bend_fraction = T  # Creates a gradual bending effect over the length
-X_bend = X * np.cos(bend_fraction * bend_angle) + Z * np.sin(bend_fraction * bend_angle)
-Z_bend = -X * np.sin(bend_fraction * bend_angle) + Z * np.cos(bend_fraction * bend_angle)
-X, Z = X_bend, Z_bend
+# Apply sharp bending transformation at the halfway point
+halfway_index = n_points_length // 2
+X[:, halfway_index:] += (Z[:, halfway_index:] - Z[:, halfway_index][:, np.newaxis]) * np.sin(bend_angle)
+Z[:, halfway_index:] = Z[:, halfway_index][:, np.newaxis] - (Z[:, halfway_index:] - Z[:, halfway_index][:, np.newaxis]) * np.cos(bend_angle)
+
 
 # Pressure distribution
 pressure = np.linspace(pressure_inlet, pressure_outlet, n_points_length)
